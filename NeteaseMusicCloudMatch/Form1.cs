@@ -56,31 +56,31 @@ namespace NeteaseMusicCloudMatch
             dataGridView1.RowHeadersVisible = false;
             DataGridViewTextBoxColumn colListId = new DataGridViewTextBoxColumn();
             colListId.Name = "colListId";
-            colListId.Width = 40;
+            //colListId.Width = 40;
             colListId.HeaderText = "#";
             colListId.ReadOnly = true;
 
             DataGridViewTextBoxColumn colSongId = new DataGridViewTextBoxColumn();
             colSongId.Name = "colSongId";
-            colSongId.Width = 80;
-            colSongId.HeaderText = "文件ID";
+            //colSongId.Width = 80;
+            colSongId.HeaderText = "ID";
             colSongId.ReadOnly = true;
 
             DataGridViewTextBoxColumn colFileName = new DataGridViewTextBoxColumn();
             colFileName.Name = "colFileName";
-            colFileName.Width = 200;
+            //colFileName.Width = 200;
             colFileName.HeaderText = "文件名称";
             colFileName.ReadOnly = true;
 
             DataGridViewTextBoxColumn colFileSize = new DataGridViewTextBoxColumn();
             colFileSize.Name = "colFileSize";
-            colFileSize.Width = 68;
+            //colFileSize.Width = 68;
             colFileSize.HeaderText = "大小";
             colFileSize.ReadOnly = true;
 
             DataGridViewTextBoxColumn colAddTime = new DataGridViewTextBoxColumn();
             colAddTime.Name = "colAddTime";
-            colAddTime.Width = 130;
+            //colAddTime.Width = 130;
             colAddTime.HeaderText = "上传时间";
             colAddTime.ReadOnly = true;
 
@@ -88,6 +88,12 @@ namespace NeteaseMusicCloudMatch
                 new DataGridViewColumn[] {
                                     colListId, colSongId, colFileName, colFileSize, colAddTime
                 });
+
+            dataGridView1.Columns[0].FillWeight = 5;
+            dataGridView1.Columns[1].FillWeight = 15;
+            dataGridView1.Columns[2].FillWeight = 30;
+            dataGridView1.Columns[3].FillWeight = 10;
+            dataGridView1.Columns[4].FillWeight = 20;
         }
         #endregion
 
@@ -350,49 +356,6 @@ namespace NeteaseMusicCloudMatch
         }
         #endregion
 
-        #region 判断歌曲是否存在
-        private bool CheckSongStatus(string songId)
-        {
-            try
-            {
-                string apiUrl = "https://music.163.com/api/song/detail/?ids=[" + songId + "]";
-                string html = CommonHelper.GetHtml(apiUrl, wyCookie);
-                if (CommonHelper.CheckJson(html))
-                {
-                    var json = JObject.Parse(html);
-                    if (json["code"]?.ToString() == "200")
-                    {
-                        var jarr = JArray.Parse(json["songs"]?.ToString());
-                        if (jarr.Count > 0)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    MessageBox.Show(html, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                MessageBox.Show(ex.Message);
-                return false;
-            }
-        }
-
-        #endregion
-
         #region 判断云盘文件是否存在
         private bool CheckCloudFileStatus(string songId)
         {
@@ -435,6 +398,63 @@ namespace NeteaseMusicCloudMatch
         }
         #endregion
 
+        #region 判断歌曲是否存在
+        private int CheckSongStatus(string songId)
+        {
+            try
+            {
+                if (songId == "0")
+                {
+                    DialogResult result = MessageBox.Show("确定要取消匹配歌曲吗？", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (result == DialogResult.Yes)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return -1;
+                    }
+                }
+                else
+                {
+                    string apiUrl = "https://music.163.com/api/song/detail/?ids=[" + songId + "]";
+                    string html = CommonHelper.GetHtml(apiUrl, wyCookie);
+                    if (CommonHelper.CheckJson(html))
+                    {
+                        var json = JObject.Parse(html);
+                        if (json["code"]?.ToString() == "200")
+                        {
+                            var jarr = JArray.Parse(json["songs"]?.ToString());
+                            if (jarr.Count > 0)
+                            {
+                                return 1;
+                            }
+                            else
+                            {
+                                return 0;
+                            }
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show(html, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                MessageBox.Show(ex.Message);
+                return -1;
+            }
+        }
+        #endregion
+
         #region 匹配纠正
         private void button3_Click(object sender, EventArgs e)
         {
@@ -456,9 +476,8 @@ namespace NeteaseMusicCloudMatch
                 }
                 if (CheckCloudFileStatus(sid))
                 {
-                    if (CheckSongStatus(asid))
+                    if (CheckSongStatus(asid) == 1)
                     {
-                        // https://music.163.com/api/cloud/user/song/match?userId=119819724&songId=1397875612&adjustSongId=186145
                         string apiUrl = "https://music.163.com/api/cloud/user/song/match?userId=" + uid + "&songId=" + sid + "&adjustSongId=" + asid;
                         string html = CommonHelper.GetHtml(apiUrl, wyCookie);
                         Console.WriteLine(html);
@@ -479,7 +498,7 @@ namespace NeteaseMusicCloudMatch
                             MessageBox.Show(html, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
-                    else
+                    else if (CheckSongStatus(asid) == 0)
                     {
                         MessageBox.Show("输入的歌曲ID不存在", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }

@@ -42,7 +42,7 @@
       <HintPath>..\packages\Costura.Fody.4.0.0\lib\net40\Costura.dll</HintPath>
     </Reference>
     <Reference Include="Gma.QrCodeNet.Encoding">
-      <HintPath>..\..\icon_oumc8wh81vj\icon_oumc8wh81vj1\NeteaseMusicCloudMatch\NeteaseMusicCloudMatch\Gma.QrCodeNet.Encoding.dll</HintPath>
+      <HintPath>obj\Debug\Gma.QrCodeNet.Encoding.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
