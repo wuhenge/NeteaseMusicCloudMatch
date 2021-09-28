@@ -2,7 +2,8 @@
 
 ![1.jpg](https://dd-static.jd.com/ddimg/jfs/t1/201024/5/8896/98978/615289a7E82e53f3b/5d9eafbf6c5150ec.jpg)
 
-软件下载地址：https://pan.lanzoui.com/iv76Uulbbpi
+软件下载地址：[https://pan.lanzoui.com/iv76Uulbbpi](https://pan.lanzoui.com/iv76Uulbbpi)
 
-如何取消匹配歌曲
+如何取消匹配歌曲？
+
 歌曲ID填写0即可
