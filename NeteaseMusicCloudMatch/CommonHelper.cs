@@ -233,6 +233,10 @@ namespace NeteaseMusicCloudMatch
         {
             StringBuilder sb = new StringBuilder(1024);
             GetPrivateProfileString(section, key, def, sb, 1024, ConfigFilePath);
+            if (string.IsNullOrWhiteSpace(sb.ToString()))
+            {
+                return "false";
+            }
             return sb.ToString();
         }
 
