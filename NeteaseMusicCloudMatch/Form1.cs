@@ -35,6 +35,7 @@ namespace NeteaseMusicCloudMatch
                     LoadUIDName();
                     LoadCloudInfo();
                     button2_Click(sender, null);
+                    timer1.Enabled = false;
                 }
                 else
                 {
@@ -290,7 +291,8 @@ namespace NeteaseMusicCloudMatch
                         dataGridView1.Rows.Clear();
                     }));
                 }
-                string apiUrl = "https://music.163.com/api/v1/cloud/get?limit=30&offset=" + (pageIndex - 1) * 30;
+                int limit = 200;
+                string apiUrl = "https://music.163.com/api/v1/cloud/get?limit=" + limit + "&offset=" + (pageIndex - 1) * limit;
                 string html = CommonHelper.GetHtml(apiUrl, wyCookie);
                 if (CommonHelper.CheckJson(html))
                 {
@@ -343,6 +345,93 @@ namespace NeteaseMusicCloudMatch
             }
         }
 
+        #endregion
+
+        #region 音乐云盘搜索
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string searchValue = textBox3.Text.Trim();
+                if (string.IsNullOrWhiteSpace(searchValue))
+                {
+                    MessageBox.Show("请先输入要搜索的内容", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                DataTable dataTable = DataGridViewToDataTable(dataGridView1);
+                DataRow[] dataRows = dataTable.Select("文件名称 like '%" + searchValue + "%'");
+                if (dataRows.Length > 0)
+                {
+                    foreach (var dataRow in dataRows)
+                    {
+                        dataGridView1.Rows.Clear();
+                        int index = dataGridView1.Rows.Add();
+                        dataGridView1.Rows[index].Cells[0].Value = dataRow[0].ToString();
+                        dataGridView1.Rows[index].Cells[1].Value = dataRow[1].ToString();
+                        dataGridView1.Rows[index].Cells[2].Value = dataRow[2].ToString();
+                        dataGridView1.Rows[index].Cells[3].Value = dataRow[3].ToString();
+                        dataGridView1.Rows[index].Cells[4].Value = dataRow[4].ToString();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("未找到关于“" + searchValue + "”的内容", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                MessageBox.Show(ex.Message);
+            }
+        }
+        #endregion
+
+        #region DataGridView转DataTable
+        private DataTable DataGridViewToDataTable(DataGridView dgv)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                // 循环列标题名称，处理了隐藏的行不显示
+                for (int count = 0; count < dgv.Columns.Count; count++)
+                {
+                    if (dgv.Columns[count].Visible == true)
+                    {
+                        dt.Columns.Add(dgv.Columns[count].HeaderText.ToString());
+                    }
+                }
+
+                // 循环行，处理了隐藏的行不显示
+                for (int count = 0; count < dgv.Rows.Count; count++)
+                {
+                    DataRow dr = dt.NewRow();
+                    int curr = 0;
+                    for (int countsub = 0; countsub < dgv.Columns.Count; countsub++)
+                    {
+                        if (dgv.Columns[countsub].Visible == true)
+                        {
+                            if (dgv.Rows[count].Cells[countsub].Value != null)
+                            {
+                                dr[curr] = dgv.Rows[count].Cells[countsub].Value.ToString();
+                            }
+                            else
+                            {
+                                dr[curr] = "";
+                            }
+                            curr++;
+                        }
+                    }
+                    dt.Rows.Add(dr);
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                MessageBox.Show(ex.Message);
+                return dt;
+            }
+        }
         #endregion
 
         #region dataGridView1 选中赋值给sid

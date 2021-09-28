@@ -47,6 +47,8 @@ namespace NeteaseMusicCloudMatch
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.button4 = new System.Windows.Forms.Button();
+            this.textBox3 = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -146,6 +148,8 @@ namespace NeteaseMusicCloudMatch
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.button4);
+            this.groupBox2.Controls.Add(this.textBox3);
             this.groupBox2.Controls.Add(this.dataGridView1);
             this.groupBox2.Location = new System.Drawing.Point(12, 168);
             this.groupBox2.Name = "groupBox2";
@@ -160,19 +164,20 @@ namespace NeteaseMusicCloudMatch
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AllowUserToOrderColumns = true;
             this.dataGridView1.AllowUserToResizeRows = false;
+            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders;
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.Control;
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 19);
+            this.dataGridView1.Location = new System.Drawing.Point(3, 51);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowTemplate.Height = 23;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(544, 478);
+            this.dataGridView1.Size = new System.Drawing.Size(544, 446);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.Scroll += new System.Windows.Forms.ScrollEventHandler(this.ScrollReader);
             this.dataGridView1.Click += new System.EventHandler(this.dataGridView1_Click);
@@ -245,8 +250,30 @@ namespace NeteaseMusicCloudMatch
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // button4
+            // 
+            this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button4.Location = new System.Drawing.Point(454, 21);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(90, 25);
+            this.button4.TabIndex = 0;
+            this.button4.Text = "搜 索";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // textBox3
+            // 
+            this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox3.Location = new System.Drawing.Point(6, 22);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(442, 23);
+            this.textBox3.TabIndex = 1;
+            this.textBox3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // Form1
             // 
+            this.AcceptButton = this.button4;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.AutoScroll = true;
@@ -267,6 +294,7 @@ namespace NeteaseMusicCloudMatch
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -293,6 +321,8 @@ namespace NeteaseMusicCloudMatch
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.Button button4;
     }
 }
 
