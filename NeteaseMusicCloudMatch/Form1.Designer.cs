@@ -29,6 +29,7 @@ namespace NeteaseMusicCloudMatch
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.label2 = new System.Windows.Forms.Label();
@@ -40,11 +41,12 @@ namespace NeteaseMusicCloudMatch
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -124,7 +126,7 @@ namespace NeteaseMusicCloudMatch
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(120, 30);
             this.button1.TabIndex = 1;
-            this.button1.Text = "检测扫码状态";
+            this.button1.Text = "重新扫码登录";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -185,6 +187,21 @@ namespace NeteaseMusicCloudMatch
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "音乐云盘歌曲信息匹配纠正";
             // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(150, 82);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(200, 23);
+            this.textBox2.TabIndex = 2;
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(150, 38);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
+            this.textBox1.Size = new System.Drawing.Size(200, 23);
+            this.textBox1.TabIndex = 0;
+            // 
             // button3
             // 
             this.button3.Location = new System.Drawing.Point(376, 38);
@@ -203,13 +220,6 @@ namespace NeteaseMusicCloudMatch
             this.label4.TabIndex = 3;
             this.label4.Text = "歌曲ID：";
             // 
-            // textBox2
-            // 
-            this.textBox2.Location = new System.Drawing.Point(150, 82);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(200, 23);
-            this.textBox2.TabIndex = 2;
-            // 
             // label3
             // 
             this.label3.Location = new System.Drawing.Point(63, 41);
@@ -218,13 +228,11 @@ namespace NeteaseMusicCloudMatch
             this.label3.TabIndex = 1;
             this.label3.Text = "云盘文件ID：";
             // 
-            // textBox1
+            // timer1
             // 
-            this.textBox1.Location = new System.Drawing.Point(150, 38);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(200, 23);
-            this.textBox1.TabIndex = 0;
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 1000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Form1
             // 
@@ -275,6 +283,7 @@ namespace NeteaseMusicCloudMatch
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.LinkLabel linkLabel1;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

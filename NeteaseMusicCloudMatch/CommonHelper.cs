@@ -31,27 +31,19 @@ namespace NeteaseMusicCloudMatch
         {
             try
             {
-                if (!string.IsNullOrEmpty(url))
-                {
-                    if (url.Contains("?"))
-                    {
-                        url = url + "&timestamp=" + GetTimestamp();
-                    }
-                    else
-                    {
-                        url = url + "?timestamp=" + GetTimestamp();
-                    }
-                }
                 HttpHelper http = new HttpHelper();
                 HttpItem item = new HttpItem()
                 {
                     URL = url,
                     Method = "get",
                     Cookie = cookie,
-                    ContentType = "application/x-www-form-urlencoded",
+                    ContentType = "application/json;charset=UTF-8",
                     Referer = url,
                     ResultType = ResultType.String
                 };
+                item.Header.Add("x-from-src", RandomIp());
+                item.Header.Add("X-Real-IP", RandomIp());
+                item.Header.Add("X-Forwarded-For", RandomIp());
                 HttpResult result = http.GetHtml(item);
                 return result.Html;
             }
@@ -64,22 +56,27 @@ namespace NeteaseMusicCloudMatch
         }
         #endregion
 
-        #region 生成时间戳
-        public static string GetTimestamp()
+        #region 生成随机IP地址
+        private static string RandomIp()
         {
             Random rd = new Random();
-            var rdNext = rd.Next(100000, 1000000);
-            return (GetTimeSpan(true) + rdNext).ToString() + rdNext.ToString();
+            return LongToip(rd.Next(1884815360, 1884890111).ToString());
         }
 
         /// <summary>
-        /// 生成时间戳
+        /// 数字转换为IP地址
         /// </summary>
+        /// <param name="value">数字</param>
         /// <returns></returns>
-        public static long GetTimeSpan(bool isMills = false)
+        private static string LongToip(string value)
         {
-            var startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            return Convert.ToInt64((DateTime.UtcNow.Ticks - startTime.Ticks) / (isMills ? 10000 : 10000000));
+            long IntIp = long.Parse(value);
+            StringBuilder sb = new StringBuilder();
+            sb.Append(IntIp >> 0x18 & 0xff).Append(".");
+            sb.Append(IntIp >> 0x10 & 0xff).Append(".");
+            sb.Append(IntIp >> 0x8 & 0xff).Append(".");
+            sb.Append(IntIp & 0xff);
+            return sb.ToString();
         }
         #endregion
 
@@ -186,7 +183,10 @@ namespace NeteaseMusicCloudMatch
                     JArray j = JArray.Parse(strJson);
                     return true;
                 }
-                return false;
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception)
             {
@@ -233,10 +233,6 @@ namespace NeteaseMusicCloudMatch
         {
             StringBuilder sb = new StringBuilder(1024);
             GetPrivateProfileString(section, key, def, sb, 1024, ConfigFilePath);
-            if (string.IsNullOrWhiteSpace(sb.ToString()))
-            {
-                return "false";
-            }
             return sb.ToString();
         }
 

@@ -21,18 +21,20 @@ namespace NeteaseMusicCloudMatch
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            checkBox1.Checked = Convert.ToBoolean(CommonHelper.Read("NeteaseMusic", "LoginCheck"));
-
-            LoadDgvColumns();
+            string LoginCheck = CommonHelper.Read("NeteaseMusic", "LoginCheck");
+            if (!string.IsNullOrWhiteSpace(LoginCheck))
+            {
+                checkBox1.Checked = Convert.ToBoolean(LoginCheck);
+            }
 
             if (checkBox1.Checked)
             {
                 wyCookie = CommonHelper.Read("NeteaseMusic", "Cookie");
                 if (!string.IsNullOrEmpty(wyCookie))
                 {
-                    button1.Text = "重新扫码登录";
                     LoadUIDName();
                     LoadCloudInfo();
+                    button2_Click(sender, null);
                 }
                 else
                 {
@@ -43,6 +45,8 @@ namespace NeteaseMusicCloudMatch
             {
                 LoadQrCodeImage();
             }
+
+            LoadDgvColumns();
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -196,64 +200,65 @@ namespace NeteaseMusicCloudMatch
         #endregion
 
         #region 检测扫码状态 / 重新扫码登录
-        private void button1_Click(object sender, EventArgs e)
+        private void timer1_Tick(object sender, EventArgs e)
         {
-            if (button1.Text == "检测扫码状态")
+            string apiUrl = "https://music.163.com/api/login/qrcode/client/login?type=1&key=" + unikey;
+
+            HttpHelper http = new HttpHelper();
+            HttpItem item = new HttpItem()
             {
-                string apiUrl = "https://music.163.com/api/login/qrcode/client/login?type=1&key=" + unikey;
+                URL = apiUrl,
+                Method = "get",
+                ContentType = "application/json;charset=UTF-8",
+                Referer = apiUrl,
+                ResultType = ResultType.String
+            };
+            HttpResult result = http.GetHtml(item);
 
-                HttpHelper http = new HttpHelper();
-                HttpItem item = new HttpItem()
-                {
-                    URL = apiUrl,
-                    Method = "get",
-                    ContentType = "application/x-www-form-urlencoded",
-                    Referer = apiUrl,
-                    ResultType = ResultType.String
-                };
-                HttpResult result = http.GetHtml(item);
-
-                string html = result.Html;
-                if (CommonHelper.CheckJson(html))
-                {
-                    var json = JObject.Parse(html);
-                    string code = json["code"]?.ToString();
-                    string message = json["message"]?.ToString();
-                    if (code == "800")
-                    {
-                        wyCookie = string.Empty;
-                        LoadQrCodeImage();
-                    }
-                    else if (code == "803")
-                    {
-                        wyCookie = result.Cookie.Replace(",", ";");
-                        CommonHelper.Write("NeteaseMusic", "Cookie", wyCookie);
-                        button1.Text = "重新扫码登录";
-
-                        LoadUIDName();
-                        LoadCloudInfo();
-                    }
-                    string messStr = code + ", " + message;
-                    Console.WriteLine(messStr);
-                    MessageBox.Show(messStr);
-                }
-                else
-                {
-                    MessageBox.Show(html, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            else if (button1.Text == "重新扫码登录")
+            string html = result.Html;
+            if (CommonHelper.CheckJson(html))
             {
-                DialogResult result = MessageBox.Show("确定要重新扫码登录吗？", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
+                var json = JObject.Parse(html);
+                string code = json["code"]?.ToString();
+                string message = json["message"]?.ToString();
+                if (code == "800")
                 {
                     wyCookie = string.Empty;
-                    button1.Text = "检测扫码状态";
-                    label1.Text = "          ";
-                    label2.Text = "          ";
-
                     LoadQrCodeImage();
                 }
+                else if (code == "803")
+                {
+                    wyCookie = result.Cookie.Replace(",", ";");
+                    CommonHelper.Write("NeteaseMusic", "Cookie", wyCookie);
+
+                    LoadUIDName();
+                    LoadCloudInfo();
+                    button2_Click(sender, null);
+
+                    timer1.Enabled = false;
+                }
+                string messStr = code + ", " + message;
+                Console.WriteLine(messStr);
+                //MessageBox.Show(messStr);
+            }
+            else
+            {
+                MessageBox.Show(html, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("确定要重新扫码登录吗？", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                wyCookie = string.Empty;
+                label1.Text = string.Empty;
+                label2.Text = string.Empty;
+
+                LoadQrCodeImage();
+
+                timer1.Enabled = true;
             }
         }
         #endregion
@@ -280,7 +285,10 @@ namespace NeteaseMusicCloudMatch
             {
                 if (pageIndex <= 1)
                 {
-                    dataGridView1.Rows.Clear();
+                    this.Invoke(new MethodInvoker(delegate ()
+                    {
+                        dataGridView1.Rows.Clear();
+                    }));
                 }
                 string apiUrl = "https://music.163.com/api/v1/cloud/get?limit=30&offset=" + (pageIndex - 1) * 30;
                 string html = CommonHelper.GetHtml(apiUrl, wyCookie);
@@ -303,12 +311,12 @@ namespace NeteaseMusicCloudMatch
                                 this.Invoke(new MethodInvoker(delegate ()
                                 {
                                     index = dataGridView1.Rows.Add();
+                                    dataGridView1.Rows[index].Cells[0].Value = dataGridView1.Rows.Count;
+                                    dataGridView1.Rows[index].Cells[1].Value = songId;
+                                    dataGridView1.Rows[index].Cells[2].Value = fileName;
+                                    dataGridView1.Rows[index].Cells[3].Value = CommonHelper.GetFileSize(Convert.ToInt64(fileSize));
+                                    dataGridView1.Rows[index].Cells[4].Value = CommonHelper.UnixTimestampToDateTime(addTime);
                                 }));
-                                dataGridView1.Rows[index].Cells[0].Value = dataGridView1.Rows.Count;
-                                dataGridView1.Rows[index].Cells[1].Value = songId;
-                                dataGridView1.Rows[index].Cells[2].Value = fileName;
-                                dataGridView1.Rows[index].Cells[3].Value = CommonHelper.GetFileSize(Convert.ToInt64(fileSize));
-                                dataGridView1.Rows[index].Cells[4].Value = CommonHelper.UnixTimestampToDateTime(addTime);
                             }
                         }
                     }
@@ -405,7 +413,7 @@ namespace NeteaseMusicCloudMatch
             {
                 if (songId == "0")
                 {
-                    DialogResult result = MessageBox.Show("确定要取消匹配歌曲吗？", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    DialogResult result = MessageBox.Show("确定要取消匹配吗？", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
                         return 1;
@@ -466,12 +474,17 @@ namespace NeteaseMusicCloudMatch
 
                 if (string.IsNullOrEmpty(sid))
                 {
-                    MessageBox.Show("请先选择云盘文件", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("请选择云盘文件", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 else if (string.IsNullOrEmpty(asid))
                 {
                     MessageBox.Show("请输入歌曲ID", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                else if (sid.Equals(asid))
+                {
+                    MessageBox.Show("已经匹配成功，无需再次匹配。", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     return;
                 }
                 if (CheckCloudFileStatus(sid))
@@ -487,6 +500,8 @@ namespace NeteaseMusicCloudMatch
                             if (json["code"]?.ToString() == "200")
                             {
                                 MessageBox.Show("匹配纠正成功！");
+
+                                button2_Click(sender, null);
                             }
                             else
                             {
