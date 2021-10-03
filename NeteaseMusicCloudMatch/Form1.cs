@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
@@ -552,6 +553,61 @@ namespace NeteaseMusicCloudMatch
         }
         #endregion
 
+        #region 根据URL正则匹配歌曲ID
+        private string GetUrlMatchId(string url)
+        {
+            string item = string.Empty, id = string.Empty;
+            if (url.Contains("/m/"))
+            {
+                var match = Regex.Match(url, "m/(\\w+)\\?[\\s\\S]*?&id=(\\d+)");
+                if (match.Success)
+                {
+                    item = match.Groups[1].Value;
+                    id = match.Groups[2].Value;
+                }
+                match = Regex.Match(url, "/(\\w+)\\?id=(\\d+)");
+                if (match.Success)
+                {
+                    item = match.Groups[1].Value;
+                    id = match.Groups[2].Value;
+                }
+            }
+            else
+            {
+                var match = Regex.Match(url, "/(\\w+)\\?id=(\\d+)");
+                if (match.Success)
+                {
+                    item = match.Groups[1].Value;
+                    id = match.Groups[2].Value;
+                }
+                match = Regex.Match(url, "com/(\\w+)/(\\w+)");
+                if (match.Success)
+                {
+                    item = match.Groups[1].Value;
+                    id = match.Groups[2].Value;
+                }
+            }
+
+            if (item.Contains("toplist"))
+            {
+                MessageBox.Show("这是排行榜链接，请输入单曲链接");
+            }
+            else if (item.Contains("playlist"))
+            {
+                MessageBox.Show("这是歌单链接，请输入单曲链接");
+            }
+            else if (item.Contains("album"))
+            {
+                MessageBox.Show("这是专辑链接，请输入单曲链接");
+            }
+            else if (item.Contains("song"))
+            {
+                return id;
+            }
+            return string.Empty;
+        }
+        #endregion
+
         #region 匹配纠正
         private void button3_Click(object sender, EventArgs e)
         {
@@ -576,9 +632,19 @@ namespace NeteaseMusicCloudMatch
                     MessageBox.Show("已经匹配成功，无需再次匹配。", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     return;
                 }
+                else if (asid.StartsWith("http"))
+                {
+                    asid = GetUrlMatchId(asid);
+                    if (string.IsNullOrWhiteSpace(asid))
+                    {
+                        return;
+                    }
+                }
+
                 if (CheckCloudFileStatus(sid))
                 {
-                    if (CheckSongStatus(asid) == 1)
+                    int songStatus = CheckSongStatus(asid);
+                    if (songStatus == 1)
                     {
                         string apiUrl = "https://music.163.com/api/cloud/user/song/match?userId=" + uid + "&songId=" + sid + "&adjustSongId=" + asid;
                         string html = CommonHelper.GetHtml(apiUrl, wyCookie);
@@ -602,7 +668,7 @@ namespace NeteaseMusicCloudMatch
                             MessageBox.Show(html, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
-                    else if (CheckSongStatus(asid) == 0)
+                    else if (songStatus == 0)
                     {
                         MessageBox.Show("输入的歌曲ID不存在", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
